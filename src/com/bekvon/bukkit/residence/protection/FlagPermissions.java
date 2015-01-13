@@ -204,6 +204,10 @@ public class FlagPermissions {
         addMaterialToUseFlag(Material.BURNING_FURNACE, "container");
         addMaterialToUseFlag(Material.DISPENSER, "container");
         addMaterialToUseFlag(Material.CAKE_BLOCK, "cake");
+
+        // Almura 2.0 Compatibilites
+        addMaterialToUseFlag(Material.getMaterial("ALMURA_STORAGEQUANTUM_CHEST"), "container");
+        addMaterialToUseFlag(Material.getMaterial("ALMURA_STORAGEDOCK_CHEST"), "container");
     }
 
     public static FlagPermissions parseFromConfigNode(String name, ConfigurationSection node) {

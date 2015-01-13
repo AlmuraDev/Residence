@@ -14,7 +14,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.getspout.spoutapi.SpoutManager;
 
 import com.bekvon.bukkit.residence.chat.ChatChannel;
 import com.bekvon.bukkit.residence.event.ResidenceCommandEvent;
@@ -22,7 +21,6 @@ import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.bekvon.bukkit.residence.protection.FlagPermissions;
-import com.bekvon.bukkit.residence.spout.ResidenceSpout;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import java.util.List;
 
@@ -223,10 +221,7 @@ public class ResidenceCommandListener extends Residence {
         }
         if (cmd.equals("subzone") || cmd.equals("sz")) {
             return commandResSubzone(args, resadmin, player, page);
-        }
-        if (cmd.equals("gui")) {
-            return commandResGui(args, resadmin, player, page);
-        }
+        }       
         if (cmd.equals("sublist")) {
             return commandResSublist(args, resadmin, player, page);
         }
@@ -555,15 +550,18 @@ public class ResidenceCommandListener extends Residence {
     private boolean commandResSelect(String[] args, boolean resadmin, Player player, int page) {
         PermissionGroup group = Residence.getPermissionManager().getGroup(player);
         if (!group.selectCommandAccess() && !resadmin) {
-            player.sendMessage(ChatColor.RED + language.getPhrase("SelectDiabled"));
+            player.sendMessage(ChatColor.GOLD + language.getPhrase("SelectDiabled"));
+            System.out.println("Failed 1");
             return true;
         }
         if (!group.canCreateResidences() && group.getMaxSubzoneDepth() <= 0 && !resadmin) {
-            player.sendMessage(ChatColor.RED + language.getPhrase("SelectDiabled"));
+            player.sendMessage(ChatColor.BLUE + language.getPhrase("SelectDiabled"));
+            System.out.println("Failed 2");
             return true;
         }
         if ((!player.hasPermission("residence.create") && player.isPermissionSet("residence.create") && !player.hasPermission("residence.select") && player.isPermissionSet("residence.select")) && !resadmin) {
-            player.sendMessage(ChatColor.RED + language.getPhrase("SelectDiabled"));
+            player.sendMessage(ChatColor.AQUA + language.getPhrase("SelectDiabled"));
+            System.out.println("Failed 3");
             return true;
         }
         if (args.length == 2) {
@@ -1406,18 +1404,7 @@ public class ResidenceCommandListener extends Residence {
         }
         return true;
     }
-
-    private boolean commandResGui(String[] args, boolean resadmin, Player player, int page) {
-        if (slistener != null) {
-            if (args.length == 1) {
-                ResidenceSpout.showResidenceFlagGUI(SpoutManager.getPlayer(player), this, rmanager.getNameByLoc(player.getLocation()), resadmin);
-            } else if (args.length == 2) {
-                ResidenceSpout.showResidenceFlagGUI(SpoutManager.getPlayer(player), this, args[1], resadmin);
-            }
-        }
-        return true;
-    }
-
+  
     private boolean commandResList(String[] args, boolean resadmin, Player player, int page) {
         if (args.length == 2) {
             if (args[1].equals("list")) {

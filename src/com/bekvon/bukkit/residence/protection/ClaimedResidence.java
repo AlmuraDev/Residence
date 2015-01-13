@@ -605,7 +605,7 @@ public class ClaimedResidence {
         }
     }
 
-    protected CuboidArea getAreaByLoc(Location loc) {
+    public CuboidArea getAreaByLoc(Location loc) {
         for (CuboidArea thisarea : areas.values()) {
             if (thisarea.containsLoc(loc)) {
                 return thisarea;
