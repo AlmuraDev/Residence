@@ -58,6 +58,7 @@ public class ResidencePlayerListener implements Listener {
     protected int minUpdateTime;
     protected boolean chatenabled;
     protected List<String> playerToggleChat;
+    public boolean moveUpdate;
 
     public ResidencePlayerListener() {
         currentRes = new HashMap<String, String>();
@@ -372,7 +373,7 @@ public class ResidencePlayerListener implements Listener {
         }
         
         ClaimedResidence res = Residence.getResidenceManager().getByLoc(loc);
-        if (event.getCause() == TeleportCause.ENDER_PEARL) {
+        if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.COMMAND || event.getCause() == TeleportCause.NETHER_PORTAL) {
             if (res != null) {
                 String areaname = Residence.getResidenceManager().getNameByLoc(loc);
                 if (!res.getPermissions().playerHas(player.getName(), "move", true)) {
@@ -392,6 +393,11 @@ public class ResidencePlayerListener implements Listener {
                 }
             }
         }
+        if (event.getCause() == TeleportCause.UNKNOWN) { // Set so the Teleport back command from MOVE isn't blocked.
+            if (Residence.getConfigManager().debugEnabled()) {
+                //Bukkit.getLogger().severe("[Residence]- Detected a failed move event use to permissions.");
+            }
+        }
         handleNewLocation(player, loc, false);
     }
 
@@ -404,6 +410,7 @@ public class ResidencePlayerListener implements Listener {
         long last = lastUpdate.get(player.getName());
         long now = System.currentTimeMillis();
         if (now - last < Residence.getConfigManager().getMinMoveUpdateInterval()) {
+            moveUpdate = false;
             return;
         }
         lastUpdate.put(player.getName(), now);
@@ -412,6 +419,7 @@ public class ResidencePlayerListener implements Listener {
                 return;
             }
         }
+        moveUpdate = true;
         handleNewLocation(player, event.getTo(), true);
     }
 
@@ -465,9 +473,10 @@ public class ResidencePlayerListener implements Listener {
             if (!res.getPermissions().playerHas(pname, "move", true) && !Residence.isResAdminOn(player) && !player.hasPermission("residence.admin.move")) {
                 Location lastLoc = lastOutsideLoc.get(pname);
                 if (lastLoc != null) {
-                    player.teleport(lastLoc);
+                    player.teleport(lastLoc, TeleportCause.UNKNOWN); //Send UNKNOWN so it doesn't get blocked by TP flag
+                    
                 } else {
-                    player.teleport(res.getOutsideFreeLoc(loc));
+                    player.teleport(res.getOutsideFreeLoc(loc), TeleportCause.UNKNOWN); //Send UNKNOWN so it doesn't get blocked by TP Flag.
                 }
                 player.sendMessage(ChatColor.RED + Residence.getLanguage().getPhrase("ResidenceMoveDeny", res.getName().split("\\.")[res.getName().split("\\.").length - 1]));
                 return;

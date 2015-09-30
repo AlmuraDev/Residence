@@ -37,7 +37,9 @@ public class FlagPermissions {
     protected FlagPermissions parent;
 
     public static void addMaterialToUseFlag(Material mat, String flag) {
-        matUseFlagList.put(mat, flag);
+        if (mat != null && flag != null) {
+            matUseFlagList.put(mat, flag);
+        }
     }
 
     public static void removeMaterialFromUseFlag(Material mat) {
