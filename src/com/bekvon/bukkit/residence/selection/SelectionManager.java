@@ -26,7 +26,7 @@ public class SelectionManager {
     protected Server server;
 
     public static final int MAX_HEIGHT = 255,MIN_HEIGHT = 0;
-    
+
     public enum Direction
     {
         UP,DOWN,PLUSX,PLUSZ,MINUSX,MINUSZ
@@ -34,7 +34,7 @@ public class SelectionManager {
 
     public SelectionManager(Server server)
     {
-    	this.server = server;
+        this.server = server;
         playerLoc1 = Collections.synchronizedMap(new HashMap<String,Location>());
         playerLoc2 = Collections.synchronizedMap(new HashMap<String,Location>());
     }
@@ -77,7 +77,7 @@ public class SelectionManager {
             player.sendMessage(ChatColor.YELLOW+Residence.getLanguage().getPhrase("Selection.Total.Size")+":"+ChatColor.DARK_AQUA+" " + cuboidArea.getSize());
             PermissionGroup group = Residence.getPermissionManager().getGroup(player);
             if(Residence.getConfigManager().enableEconomy())
-            player.sendMessage(ChatColor.YELLOW+Residence.getLanguage().getPhrase("Land.Cost")+":"+ChatColor.DARK_AQUA+" " + ((int)Math.ceil((double)cuboidArea.getSize()*group.getCostPerBlock())));
+                player.sendMessage(ChatColor.YELLOW+Residence.getLanguage().getPhrase("Land.Cost")+":"+ChatColor.DARK_AQUA+" " + ((int)Math.ceil((double)cuboidArea.getSize()*group.getCostPerBlock())));
             player.sendMessage(ChatColor.YELLOW+"X"+Residence.getLanguage().getPhrase("Size")+":"+ChatColor.DARK_AQUA+" " + cuboidArea.getXSize());
             player.sendMessage(ChatColor.YELLOW+"Y"+Residence.getLanguage().getPhrase("Size")+":"+ChatColor.DARK_AQUA+" " + cuboidArea.getYSize());
             player.sendMessage(ChatColor.YELLOW+"Z"+Residence.getLanguage().getPhrase("Size")+":"+ChatColor.DARK_AQUA+" " + cuboidArea.getZSize());
@@ -329,21 +329,30 @@ public class SelectionManager {
         playerLoc2.put(player.getName(), area.getLowLoc());
     }
 
-    private Direction getDirection(Player player)
-    {
+    private Direction getDirection(Player player) {
+
+        int yaw = (int) player.getLocation().getYaw();
+
+        if (yaw < 0)
+            yaw += 360;
+
+        yaw += 45;
+        yaw %= 360;
+
+        int facing = yaw / 90;
+
         float pitch = player.getLocation().getPitch();
-        float yaw = player.getLocation().getYaw();
-        if(pitch<-50)
+        if (pitch < -50)
             return Direction.UP;
-        if(pitch > 50)
+        if (pitch > 50)
             return Direction.DOWN;
-        if((yaw>45 && yaw<135) || (yaw<-45 && yaw>-135))
+        if (facing == 1) // east
             return Direction.MINUSX;
-        if((yaw>225 && yaw<315) ||  (yaw<-225 && yaw>-315))
+        if (facing == 3) // west
             return Direction.PLUSX;
-        if((yaw>135 && yaw<225) || (yaw<-135 && yaw>-225))
+        if (facing == 2) // north
             return Direction.MINUSZ;
-        if((yaw<45 || yaw>315) || (yaw>-45 || yaw<-315))
+        if (facing == 0) // south
             return Direction.PLUSZ;
         return null;
     }

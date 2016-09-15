@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.economy.ResidenceBank;
 import com.bekvon.bukkit.residence.economy.TransactionManager;
+import com.bekvon.bukkit.residence.event.ResidenceRenameEvent;
 import com.bekvon.bukkit.residence.event.ResidenceTPEvent;
 import com.bekvon.bukkit.residence.itemlist.ItemList.ListType;
 import com.bekvon.bukkit.residence.itemlist.ResidenceItemList;
@@ -93,6 +94,7 @@ public class ClaimedResidence {
             }
         }
         if (!area.getWorld().getName().equalsIgnoreCase(perms.getWorld())) {
+            System.out.println("Area World name: " + area.getWorld().getName() + " Perms World: " + perms.getWorld());
             if (player != null) {
                 player.sendMessage(ChatColor.RED + Residence.getLanguage().getPhrase("AreaDiffWorld"));
             }
@@ -173,10 +175,14 @@ public class ClaimedResidence {
     }
 
     public boolean replaceArea(CuboidArea neware, String name) {
-        return this.replaceArea(null, neware, name, true);
+        return this.replaceArea(null, neware, name, true, null);
+    }
+    
+    public boolean replaceArea(CuboidArea neware, String name, boolean resadmin) {
+        return this.replaceArea(null, neware, name, true, null);
     }
 
-    public boolean replaceArea(Player player, CuboidArea newarea, String name, boolean resadmin) {
+    public boolean replaceArea(Player player, CuboidArea newarea, String name, boolean resadmin, ClaimedResidence fromRes) {
         if (!areas.containsKey(name)) {
             if (player != null)
                 player.sendMessage(ChatColor.RED + Residence.getLanguage().getPhrase("AreaNonExist"));
@@ -279,6 +285,11 @@ public class ClaimedResidence {
         areas.put(name, newarea);
         Residence.getResidenceManager().calculateChunks(getName());
         player.sendMessage(ChatColor.GREEN + Residence.getLanguage().getPhrase("AreaUpdate"));
+                       
+        // This is used to trick plugins into updating their information especially Dynmap.
+        ResidenceRenameEvent resevent = new ResidenceRenameEvent(fromRes, name, name);        
+        Residence.getServ().getPluginManager().callEvent(resevent);
+
         return true;
     }
 

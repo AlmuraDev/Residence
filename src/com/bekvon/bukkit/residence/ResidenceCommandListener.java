@@ -765,7 +765,7 @@ public class ResidenceCommandListener extends Residence {
                 if (smanager.hasPlacedBoth(player.getName())) {
                     ClaimedResidence res = rmanager.getByName(args[2]);
                     if (res != null) {
-                        res.replaceArea(player, new CuboidArea(smanager.getPlayerLoc1(player.getName()), smanager.getPlayerLoc2(player.getName())), args[3], resadmin);
+                        res.replaceArea(player, new CuboidArea(smanager.getPlayerLoc1(player.getName()), smanager.getPlayerLoc2(player.getName())), args[3], resadmin, res);
                     } else {
                         player.sendMessage(ChatColor.RED + language.getPhrase("InvalidResidence"));
                     }
