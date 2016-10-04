@@ -13,9 +13,12 @@ import com.bekvon.bukkit.residence.protection.ResidenceManager;
 import com.bekvon.bukkit.residence.permissions.PermissionManager;
 import com.bekvon.bukkit.residence.permissions.PermissionGroup;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,6 +30,9 @@ import org.bukkit.entity.Player;
  * @author Administrator
  */
 public class TransactionManager {
+    public static final Locale CURRENCY_LOCALE = new Locale("en", "US");
+    public static final NumberFormat NUMBER_FORMAT = NumberFormat.getCurrencyInstance(CURRENCY_LOCALE);
+    
     ResidenceManager manager;
     private Map<String, Integer> sellAmount;
     PermissionManager gm;
@@ -38,7 +44,8 @@ public class TransactionManager {
             return false;
         }
         if (!econ.canAfford(player.getName(), amount)) {
-            player.sendMessage(ChatColor.RED + Residence.getLanguage().getPhrase("NotEnoughMoney"));
+            //player.sendMessage(ChatColor.RED + Residence.getLanguage().getPhrase("NotEnoughMoney"));
+            player.sendMessage(ChatColor.RED + "Insufficient funds to complete purchase. Purchase Amount: " + NUMBER_FORMAT.format(amount) + ".  You need an additional: " + NUMBER_FORMAT.format(amount-econ.getBalance(player.getName())) + ".");
             return false;
         }
         econ.subtract(player.getName(), amount);
